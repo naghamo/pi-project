@@ -1,0 +1,68 @@
+def follow(obj):
+    global BT_status
+    global stop
+    global status
+    status=True
+    
+    if not BT_status:
+        os.system('omxplayer /home/pi/Desktop/project/Sounds/connect.wav &')
+        time.sleep(1)
+        return render_template('error.html')
+    stopm()
+    timer=False
+    while True:
+        if not status:
+            stop=True
+            return ""
+        a1=recinfo('a'+obj)
+        if(a1=='p'):
+            os.system('omxplayer /home/pi/Desktop/project/Sounds/error.wav &')
+            time.sleep(1.5)
+            return render_template('error.html')
+        elif(float(a1)>15):
+            if not status:
+                stop=True
+                return ""
+            turn(float(a1))
+            
+            a2=recinfo('a'+obj)
+            if not status:
+                stop=True
+                return ""
+            if(a2=='p'):
+                os.system('omxplayer /home/pi/Desktop/project/Sounds/error.wav &')
+                
+                time.sleep(1.5)
+                return render_template('error.html')
+            else:
+                if not status:
+                    stop=True
+                    return ""
+                if(float(a2)<15):
+                    if(2*int(a1)>180):
+                        a3=-1*2*int(a1)
+                    elif(2*int(a1)<180):
+                        a3=360-2*int(a1)
+                    else:
+                        a3=180
+                    turn(a3)
+                
+            if not status:
+                stop=True
+                return ""
+            d=recinfo('d'+obj)
+    
+            if(d=='p'):
+                os.system('omxplayer /home/pi/Desktop/project/Sounds/error.wav &')
+                time.sleep(1)
+                return render_template('error.html')
+            elif(float(d)>65):
+                drive(True,True,False,False)
+                timer=False
+            elif(float(d)<65 and not timer):
+                stopm()
+                timer=True
+                ti=time.time()
+            if(timer and time.time()-ti>60):
+                    
+                return render_template('Manual control.html', status="I stoped tracking ",ip=ip_address,BT=BT_status)
